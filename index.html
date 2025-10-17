@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>GitHub User Fetcher</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>GitHub User Fetcher</h1>
+        <form id="github-user-${seed}">
+            <div class="form-group">
+                <label for="username">GitHub Username</label>
+                <input type="text" class="form-control" id="username" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Fetch User</button>
+        </form>
+        <div class="mt-3">
+            <h2>Account Creation Date:</h2>
+            <p id="github-created-at"></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('github-user-${seed}').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const token = new URLSearchParams(window.location.search).get('token');
+            const url = `https://api.github.com/users/${username}${token ? '?access_token=' + token : ''}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.created_at) {
+                        document.getElementById('github-created-at').innerText = new Date(data.created_at).toISOString().split('T')[0];
+                    } else {
+                        document.getElementById('github-created-at').innerText = 'User not found.';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('github-created-at').innerText = 'Error fetching data.';
+                });
+        });
+    </script>
+</body>
+</html>
